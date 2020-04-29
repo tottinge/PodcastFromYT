@@ -70,7 +70,7 @@ def process_file(sourcefile):
     print_stanza(base_filename, new_filename, jdoc)
 
     targetfile = pathjoin(TARGET_DIR, new_filename)
-    #copyfile(sourcefile, targetfile)
+    copyfile(sourcefile, targetfile)
 
 if __name__ == "__main__":
     if len(sys.argv) <2:
