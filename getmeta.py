@@ -45,7 +45,7 @@ def print_stanza(base_filename, new_filename, youtube_json):
     <item>
       <title>{youtube_json.title}</title>
       <itunes:author>joshua@industriallogic.com</itunes:author>
-      <author>joshua@industriallogic.com</author>
+      <author>joshua@industriallogic.com (Joshua Kerievsky)</author>
 
       <itunes:image href="http://www.modernagile.org/podcast/cover_1400.jpg" />
       <enclosure url="http://www.modernagile.org/podcast/{new_filename}" length="{length_in_bytes}" type="audio/mp3"/>
