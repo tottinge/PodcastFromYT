@@ -1,3 +1,8 @@
+"""
+Generate the XML to add an entry to an rss feed.
+
+See notes inside print function.
+"""
 import sys
 from os.path import join as pathjoin
 from os.path import splitext
@@ -34,6 +39,8 @@ def format_duration(duration):
     seconds = duration[4:]
     return f"{hours}:{minutes}:{seconds}"
 
+def clean_title(title):
+    return title
 
 central = timezone('US/Central')
 def RFC822_date():
@@ -41,20 +48,31 @@ def RFC822_date():
     return now.strftime('%a, %d %b %Y %X %z')
 
 def print_stanza(base_filename, new_filename, youtube_json):
+    """This is almost perfectly wrong.
+    It's handy to print while we work things out in absence of unit tests.
+    But really, printing an interpolated string is awful. 
+    We should REALLY be opening the index.rss and inserting the <item> nodes
+    directly instead of copy paste. This is pretty dumb, really.
+    But it works okay for right now, and helps us get a start.
+    It's not THE ANSWER.
+    It's for right now, only.
+    """
     tags = get_tags_for(base_filename)
     new_filename = create_mp3_filename_from_title(youtube_json.title)
     guid = uuid.uuid4().hex
     duration = format_duration(youtube_json.duration)
     length_in_bytes = tags.info.size_bytes
+    title = clean_title(youtube_json.title)
 
     print(f"""
     <item>
-      <title>{youtube_json.title}</title>
+      <title>{title}</title>
       <itunes:author>joshua@industriallogic.com</itunes:author>
       <author>joshua@industriallogic.com (Joshua Kerievsky)</author>
 
       <itunes:image href="http://www.modernagile.org/podcast/cover_1400.jpg" />
       <enclosure url="http://www.modernagile.org/podcast/{new_filename}" length="{length_in_bytes}" type="audio/mp3"/>
+      <link>{youtube_json.webpage_url}</link>
       <guid isPermaLink="false">{guid}</guid>
       <pubDate>{RFC822_date()}</pubDate>
       <itunes:duration>{duration}</itunes:duration>
