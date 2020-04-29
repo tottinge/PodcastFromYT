@@ -6,6 +6,7 @@ import eyed3
 import re
 import uuid
 from datetime import datetime
+from pytz import timezone
 from shutil import copyfile
 from box import Box
 
@@ -27,11 +28,17 @@ def create_mp3_filename_from_title(title):
 HOUR_SECS = 60*60
 MIN_SECS = 60
 def format_duration(duration):
-    hours = int(duration / HOUR_SECS)
-    minutes = int((duration % HOUR_SECS) / MIN_SECS)
-    seconds = int(duration % MIN_SECS)
+    duration = str(int(duration)).zfill(6)
+    hours = duration[:2]
+    minutes = duration[2:4]
+    seconds = duration[4:]
     return f"{hours}:{minutes}:{seconds}"
 
+
+central = timezone('US/Central')
+def RFC822_date():
+    now = datetime.now(tz=central)
+    return now.strftime('%a, %d %b %Y %X %z')
 
 def print_stanza(base_filename, new_filename, youtube_json):
     tags = get_tags_for(base_filename)
@@ -39,7 +46,6 @@ def print_stanza(base_filename, new_filename, youtube_json):
     guid = uuid.uuid4().hex
     duration = format_duration(youtube_json.duration)
     length_in_bytes = tags.info.size_bytes
-    upload_date_ctime = datetime.now().ctime()
 
     print(f"""
     <item>
@@ -50,7 +56,7 @@ def print_stanza(base_filename, new_filename, youtube_json):
       <itunes:image href="http://www.modernagile.org/podcast/cover_1400.jpg" />
       <enclosure url="http://www.modernagile.org/podcast/{new_filename}" length="{length_in_bytes}" type="audio/mp3"/>
       <guid isPermaLink="false">{guid}</guid>
-      <pubDate>{upload_date_ctime}</pubDate>
+      <pubDate>{RFC822_date()}</pubDate>
       <itunes:duration>{duration}</itunes:duration>
       <description>{youtube_json.description}</description>
     </item>
@@ -64,9 +70,11 @@ def process_file(sourcefile):
     print_stanza(base_filename, new_filename, jdoc)
 
     targetfile = pathjoin(TARGET_DIR, new_filename)
-    copyfile(sourcefile, targetfile)
+    #copyfile(sourcefile, targetfile)
 
 if __name__ == "__main__":
-    print(f'args are {sys.argv}')
-    sourcefile = '#ModernAgileShow 39 _ Interview with David Parker-S8UyNaRL09o.mp3'
-    process_file(sourcefile)
+    if len(sys.argv) <2:
+        print("what mp3 files do you want? No parameters given.")
+        exit(1)
+    for sourcefile in sys.argv[1:]:
+        process_file(sourcefile)
