@@ -67,14 +67,13 @@ def print_stanza(base_filename, new_filename, youtube_json):
     print(f"""
     <item>
       <title>{title}</title>
-      <itunes:author>joshua@industriallogic.com</itunes:author>
-      <author>joshua@industriallogic.com (Joshua Kerievsky)</author>
-
-      <itunes:image href="http://www.modernagile.org/podcast/cover_1400.jpg" />
-      <enclosure url="http://www.modernagile.org/podcast/{new_filename}" length="{length_in_bytes}" type="audio/mp3"/>
       <link>{youtube_json.webpage_url}</link>
-      <guid isPermaLink="false">{guid}</guid>
+      <author>joshua@industriallogic.com (Joshua Kerievsky)</author>
       <pubDate>{RFC822_date()}</pubDate>
+      <guid isPermaLink="false">{guid}</guid>
+      <enclosure url="http://www.modernagile.org/podcast/{new_filename}" length="{length_in_bytes}" type="audio/mp3"/>
+      <itunes:author>joshua@industriallogic.com</itunes:author>
+      <itunes:image href="http://www.modernagile.org/podcast/cover_1400.jpg" />
       <itunes:duration>{duration}</itunes:duration>
       <description>{youtube_json.description}</description>
     </item>
