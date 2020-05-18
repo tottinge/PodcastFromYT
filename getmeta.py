@@ -20,6 +20,8 @@ from config import author_name, author_email, itunes_image, TARGET_DIR
 HOUR_SECS = 60*60
 MIN_SECS = 60
 
+author_full_email = f'{author_email} ({author_name})'
+
 
 def get_tags_for(base_filename):
     mp3_filename = base_filename+'.mp3'
@@ -33,6 +35,9 @@ def create_mp3_filename_from_title(title):
     unspaced = title.replace(' ', '_')
     without_punctuation = re.sub('\W', '', unspaced)
     return without_punctuation.replace('__', '_') + '.mp3'
+
+def make_url(new_filename):
+    return f'{host_site}/{new_filename}'
 
 def format_duration(duration):
     duration = str(int(duration)).zfill(6)
@@ -51,10 +56,12 @@ def RFC822_date():
     now = datetime.now(tz=CENTRAL)
     return now.strftime('%a, %d %b %Y %X %z')
 
-
-author_full_email = f'{author_email} ({author_name})'
-
 def print_stanza(file_size, new_filename, youtube_json):
+    """ the hack 
+    In this case, I just use string interpolation and rely upon xmllint and feed validators.
+    It works because I spent the time fixing it when it didn't not because it's algorithmically
+    likely. It's trial-and-error and copy-the-example. Not good.
+    """
     guid = uuid.uuid4().hex
     duration = format_duration(youtube_json.duration)
     length_in_bytes = str(file_size)
@@ -75,10 +82,13 @@ def print_stanza(file_size, new_filename, youtube_json):
     """
 
 
-def make_url(new_filename):
-    return f'{host_site}/{new_filename}'
 
 def make_xml(new_filename, file_size, youtube_json):
+    """ real engineering
+    Rather than relying on string interpolation, I construct HTML nodes.
+    The library providers have a vested interest in being valid, so I rely upon
+    them and the community to build a good parser/builder/manipulator.
+    """
     item = ET.Element('item')
     def add_sub(*args):
         return ET.SubElement(item, *args)
@@ -98,8 +108,8 @@ def make_xml(new_filename, file_size, youtube_json):
 def add_new_item(doc, new_item):
     channel = doc.find('channel')
     top_item = channel.find('item')
-    index = channel.getchildren().index(top_item)
-    channel.insert(index, new_item)
+    top_item_location = channel.getchildren().index(top_item)
+    channel.insert(top_item_location, new_item)
     
 
 def print_stanza_and_copy_file(sourcefile):
