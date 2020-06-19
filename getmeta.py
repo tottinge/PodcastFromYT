@@ -15,7 +15,7 @@ from shutil import copyfile
 from box import Box
 import xml.etree.cElementTree as ET
 from xml.sax.saxutils import escape
-from config import author_name, author_email, itunes_image, TARGET_DIR
+from config import *
 
 HOUR_SECS = 60*60
 MIN_SECS = 60
